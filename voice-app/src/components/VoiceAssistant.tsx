@@ -31,7 +31,6 @@ export default function VoiceAssistant() {
       model: {
         provider: 'openai',
         model: 'gpt-4o-mini',
-        function_call: 'auto',
         systemPrompt: `
 You are Sakshi’s AI Responder.
 
