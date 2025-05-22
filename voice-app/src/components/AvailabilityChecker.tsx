@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import DatePicker from 'react-datepicker';
 import { addMinutes } from 'date-fns';
+import 'react-datepicker/dist/react-datepicker.css';
 
 export default function AvailabilityChecker() {
   const [startDate, setStartDate] = useState<Date | null>(null);
@@ -43,17 +44,16 @@ export default function AvailabilityChecker() {
   };
 
   return (
-    <div className="max-w-md mx-auto p-6 bg-white rounded-2xl shadow-lg">
-      <h2 className="text-2xl font-semibold mb-4">Check Calendar Availability</h2>
+    <div className="w-full max-w-md rounded-2xl bg-white shadow-xl p-6">
+      <h2 className="text-xl font-semibold text-gray-800 mb-4">📅 Check Calendar Availability</h2>
 
-      <div className="grid grid-cols-1 gap-4 mb-4">
+      <div className="space-y-4">
         <div>
-          <label className="block mb-1 font-medium">Start Time</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Start Time</label>
           <DatePicker
             selected={startDate}
             onChange={(date) => {
               setStartDate(date);
-              // if endDate is before new startDate, bump it 1h ahead
               if (date && (!endDate || endDate <= date)) {
                 setEndDate(addMinutes(date, 60));
               }
@@ -62,13 +62,16 @@ export default function AvailabilityChecker() {
             timeFormat="p"
             timeIntervals={15}
             dateFormat="MMMM d, yyyy h:mm aa"
-            placeholderText="Select start..."
-            className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+            placeholderText="Select start time"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg 
+              focus:outline-none focus:ring-2 focus:ring-primary 
+              dark:bg-gray-800 dark:text-white dark:border-gray-600"
+
           />
         </div>
 
         <div>
-          <label className="block mb-1 font-medium">End Time</label>
+          <label className="block text-sm font-medium text-gray-700 mb-1">End Time</label>
           <DatePicker
             selected={endDate}
             onChange={(date) => setEndDate(date)}
@@ -76,41 +79,50 @@ export default function AvailabilityChecker() {
             timeFormat="p"
             timeIntervals={15}
             dateFormat="MMMM d, yyyy h:mm aa"
-            placeholderText="Select end..."
+            placeholderText="Select end time"
             minDate={startDate || undefined}
-            className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-full px-3 py-2 border border-gray-300 rounded-lg 
+              focus:outline-none focus:ring-2 focus:ring-primary 
+              dark:bg-gray-800 dark:text-white dark:border-gray-600"
+
           />
         </div>
-      </div>
 
-      <button
-        onClick={checkAvailability}
-        disabled={loading}
-        className="w-full py-2 bg-primary text-white rounded-lg font-medium hover:bg-primary/90 disabled:bg-gray-300 disabled:cursor-not-allowed"
-      >
-        {loading ? 'Checking…' : 'Check Availability'}
-      </button>
+        <button
+          onClick={checkAvailability}
+          disabled={loading}
+          className={`w-full py-2 rounded-lg font-semibold transition 
+            text-white bg-primary hover:bg-blue-700 
+            disabled:bg-gray-400 disabled:cursor-not-allowed 
+            dark:bg-blue-500 dark:hover:bg-blue-600`}
+        >
+          {loading ? 'Checking…' : 'Check Availability'}
+        </button>
 
-      <div className="mt-6 space-y-2">
-        {result.error && (
-          <p className="text-red-500">{result.error}</p>
-        )}
-        {result.message && (
-          <p className={`font-medium ${result.available ? 'text-green-600' : 'text-yellow-700'}`}>
-            {result.message}
-          </p>
-        )}
-        {result.busySlots && result.busySlots.length > 0 && (
-          <ul className="list-disc list-inside text-sm text-gray-600">
-            {result.busySlots.map((slot, i) => (
-              <li key={i}>
-                Busy from{' '}
-                <strong>{new Date(slot.start).toLocaleString()}</strong> to{' '}
-                <strong>{new Date(slot.end).toLocaleString()}</strong>
-              </li>
-            ))}
-          </ul>
-        )}
+        <div className="pt-4 space-y-2 text-sm">
+          {result.error && (
+            <p className="text-red-600 font-medium">{result.error}</p>
+          )}
+
+          {result.message && (
+            <div className={`rounded-lg px-4 py-2 border ${result.available ? 'border-green-300 bg-green-50 text-green-700' : 'border-yellow-300 bg-yellow-50 text-yellow-800'}`}>
+              {result.message}
+            </div>
+          )}
+
+          {result.busySlots && result.busySlots.length > 0 && (
+            <div className="mt-2">
+              <p className="text-gray-700 font-medium mb-1">Busy Slots:</p>
+              <ul className="list-disc list-inside text-gray-600 text-sm space-y-1">
+                {result.busySlots.map((slot, i) => (
+                  <li key={i}>
+                    <strong>{new Date(slot.start).toLocaleString()}</strong> → <strong>{new Date(slot.end).toLocaleString()}</strong>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -1,20 +1,19 @@
-@import "tailwindcss/preflight";
-@import "tailwindcss/utilities";
+@tailwind utilities;
+
 @import 'react-datepicker/dist/react-datepicker.css';
 
-
-/* Define base theme using CSS custom properties */
+/* Custom Theme Variables */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --background: #cfb3f3;
+  --foreground: #170c1c;
   --font-sans: ui-sans-serif, system-ui, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, monospace;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #170c1c;
+    --foreground: #cfb3f3;
   }
 }
 
