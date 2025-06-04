@@ -30,6 +30,27 @@ export async function POST(req: NextRequest) {
     const oauth2Client = getOAuthClient();
     oauth2Client.setCredentials(userData.tokens);
 
+    // Add token refresh handler
+    oauth2Client.on('tokens', async (tokens) => {
+      if (tokens.refresh_token) {
+        // Store the new refresh token
+        await userDoc.ref.update({
+          tokens: {
+            ...userData.tokens,
+            refresh_token: tokens.refresh_token
+          }
+        });
+      }
+      // Store the new access token
+      await userDoc.ref.update({
+        tokens: {
+          ...userData.tokens,
+          access_token: tokens.access_token,
+          expiry_date: tokens.expiry_date
+        }
+      });
+    });
+
     const calendar = google.calendar({ version: 'v3', auth: oauth2Client });
 
     // Query for free/busy status
@@ -53,6 +74,12 @@ export async function POST(req: NextRequest) {
     });
   } catch (err: any) {
     console.error('[Calendar Check Error]', err.message);
+    if (err.message === 'invalid_grant') {
+      return NextResponse.json({ 
+        error: 'Calendar access has expired. Please re-authenticate.',
+        needsReauth: true 
+      }, { status: 401 });
+    }
     return NextResponse.json({ error: 'Failed to check calendar' }, { status: 500 });
   }
 }

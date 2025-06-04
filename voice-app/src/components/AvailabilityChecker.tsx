@@ -35,6 +35,12 @@ export default function AvailabilityChecker() {
         }),
       });
       const data = await res.json();
+      
+      if (data.needsReauth) {
+        window.location.href = '/api/auth/google-calendar';
+        return;
+      }
+      
       setResult(data);
     } catch (err) {
       setResult({ error: 'Failed to fetch availability.' });
@@ -44,12 +50,19 @@ export default function AvailabilityChecker() {
   };
 
   return (
-    <div className="w-full max-w-md rounded-2xl bg-white shadow-xl p-6">
-      <h2 className="text-xl font-semibold text-gray-800 mb-4">📅 Check Calendar Availability</h2>
+    <div className="availability-checker">
+      <div className="header">
+        <div className="icon-wrapper">
+          <svg className="icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+        </div>
+        <h2 className="title">Check Availability</h2>
+      </div>
 
-      <div className="space-y-4">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Start Time</label>
+      <div className="form-grid">
+        <div className="form-group">
+          <label className="label">Start Time</label>
           <DatePicker
             selected={startDate}
             onChange={(date) => {
@@ -63,15 +76,12 @@ export default function AvailabilityChecker() {
             timeIntervals={15}
             dateFormat="MMMM d, yyyy h:mm aa"
             placeholderText="Select start time"
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg 
-              focus:outline-none focus:ring-2 focus:ring-primary 
-              dark:bg-gray-800 dark:text-white dark:border-gray-600"
-
+            className="date-picker"
           />
         </div>
 
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">End Time</label>
+        <div className="form-group">
+          <label className="label">End Time</label>
           <DatePicker
             selected={endDate}
             onChange={(date) => setEndDate(date)}
@@ -81,48 +91,55 @@ export default function AvailabilityChecker() {
             dateFormat="MMMM d, yyyy h:mm aa"
             placeholderText="Select end time"
             minDate={startDate || undefined}
-            className="w-full px-3 py-2 border border-gray-300 rounded-lg 
-              focus:outline-none focus:ring-2 focus:ring-primary 
-              dark:bg-gray-800 dark:text-white dark:border-gray-600"
-
+            className="date-picker"
           />
         </div>
+      </div>
 
-        <button
-          onClick={checkAvailability}
-          disabled={loading}
-          className={`w-full py-2 rounded-lg font-semibold transition 
-            text-white bg-primary hover:bg-blue-700 
-            disabled:bg-gray-400 disabled:cursor-not-allowed 
-            dark:bg-blue-500 dark:hover:bg-blue-600`}
-        >
-          {loading ? 'Checking…' : 'Check Availability'}
-        </button>
+      <button
+        onClick={checkAvailability}
+        disabled={loading}
+        className="button"
+      >
+        {loading ? (
+          <span className="loading-spinner">
+            <svg className="spinner" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+            </svg>
+            Checking...
+          </span>
+        ) : 'Check Availability'}
+      </button>
 
-        <div className="pt-4 space-y-2 text-sm">
-          {result.error && (
-            <p className="text-red-600 font-medium">{result.error}</p>
-          )}
+      <div className="results">
+        {result.error && (
+          <div className="result-card error-card">
+            <p>{result.error}</p>
+          </div>
+        )}
 
-          {result.message && (
-            <div className={`rounded-lg px-4 py-2 border ${result.available ? 'border-green-300 bg-green-50 text-green-700' : 'border-yellow-300 bg-yellow-50 text-yellow-800'}`}>
-              {result.message}
-            </div>
-          )}
+        {result.message && (
+          <div className={`result-card ${result.available ? 'success-card' : 'warning-card'}`}>
+            <p>{result.message}</p>
+          </div>
+        )}
 
-          {result.busySlots && result.busySlots.length > 0 && (
-            <div className="mt-2">
-              <p className="text-gray-700 font-medium mb-1">Busy Slots:</p>
-              <ul className="list-disc list-inside text-gray-600 text-sm space-y-1">
-                {result.busySlots.map((slot, i) => (
-                  <li key={i}>
-                    <strong>{new Date(slot.start).toLocaleString()}</strong> → <strong>{new Date(slot.end).toLocaleString()}</strong>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          )}
-        </div>
+        {result.busySlots && result.busySlots.length > 0 && (
+          <div className="busy-slots">
+            <p className="busy-slots-title">Busy Slots:</p>
+            <ul className="busy-slots-list">
+              {result.busySlots.map((slot, i) => (
+                <li key={i} className="busy-slot-item">
+                  <span className="slot-indicator"></span>
+                  <span>{new Date(slot.start).toLocaleString()}</span>
+                  <span>→</span>
+                  <span>{new Date(slot.end).toLocaleString()}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
     </div>
   );
