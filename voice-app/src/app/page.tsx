@@ -1,13 +1,14 @@
-import AvailabilityChecker from '@/components/AvailabilityChecker';
-import VoiceAssistant from '@/components/VoiceAssistant';
-import NoteAdder from '@/components/NoteAdder';
+// import AvailabilityChecker from '@/components/AvailabilityChecker';
+// import VoiceAssistant from '@/components/VoiceAssistant';
+// import NoteAdder from '@/components/NoteAdder';
+import DoctorList from '@/components/DoctorList';
 
 export default function Home() {
   return (
-    <main className="main-content">
+    <main className="min-h-screen bg-gray-50">
       <div className="container">
         <div className="components-grid">
-          <div className="component-wrapper">
+          {/* <div className="component-wrapper">
             <AvailabilityChecker />
           </div>
           <div className="component-wrapper">
@@ -15,6 +16,9 @@ export default function Home() {
           </div>
           <div className="component-wrapper">
             <NoteAdder />
+          </div> */}
+          <div className="component-wrapper">
+            <DoctorList />
           </div>
         </div>
       </div>
