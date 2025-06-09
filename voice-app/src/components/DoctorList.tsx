@@ -106,10 +106,7 @@ export default function DoctorList() {
 
     const config = {
       ...doctorVapiConfig,
-      assistant: {
-        ...doctorVapiConfig.assistant,
-        name: `${doctor.name}'s AI Assistant`,
-      },
+      name: `${doctor.name}'s AI Assistant`,
       serverUrl: webhookUrl,
       metadata: {
         ...doctorVapiConfig.metadata,
