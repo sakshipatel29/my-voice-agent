@@ -18,6 +18,49 @@ export async function POST(req: NextRequest) {
   catch { /* ignore */ }
 
   try {
+    // --- saveConversationNote ---
+    if (funcName === 'saveConversationNote') {
+      const { patientName, conversation, summary } = params;
+      const doctorName = body.metadata?.doctorName;
+      const doctorExpertise = body.metadata?.doctorExpertise;
+
+      if (!doctorName || !doctorExpertise) {
+        return NextResponse.json({
+          result: "I'm sorry, but I couldn't save the conversation notes because the doctor's information is missing."
+        });
+      }
+
+      try {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/conversation-notes`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            doctorName,
+            doctorExpertise,
+            patientName,
+            conversation,
+            summary,
+            timestamp: new Date().toISOString()
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to save conversation notes');
+        }
+
+        return NextResponse.json({
+          result: "I've saved the conversation notes for the doctor to review."
+        });
+      } catch (error) {
+        console.error('Error saving conversation notes:', error);
+        return NextResponse.json({
+          result: "I'm sorry, but I encountered an error while saving the conversation notes."
+        });
+      }
+    }
+
     // --- checkAvailability ---
     if (funcName === 'checkAvailability') {
       const { startTime, endTime } = params;

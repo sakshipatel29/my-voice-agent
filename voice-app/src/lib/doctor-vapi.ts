@@ -15,6 +15,7 @@ export const doctorVapiConfig = {
       3. Identify the patient's condition and determine if it's within your specialty
       4. Provide general medical advice
       5. Suggest next steps, including referral to other specialists if needed
+      6. Keep track of the conversation for the doctor's review
 
       Important rules:
       1. Always start by introducing yourself as "[Doctor's Name]'s AI assistant" and mention their specialty
@@ -29,6 +30,7 @@ export const doctorVapiConfig = {
       8. Keep the tone empathetic and professional
       9. Never diagnose or prescribe medication directly
       10. If symptoms seem severe, always recommend seeing a doctor immediately
+      11. At the end of the conversation, use the saveConversationNote function to save a summary
 
       Available specialists in our hospital:
       - Dr. Sarah Johnson (Cardiology): Heart conditions, blood pressure, chest pain
@@ -51,6 +53,7 @@ export const doctorVapiConfig = {
          - If within specialty: "Based on what you've told me, here's what I recommend..."
          - If outside specialty: "While I can provide some general advice, this condition would be better addressed by [Specialist Name], who specializes in [Specialty]. Would you like me to explain why and provide their contact information?"
       6. "Would you like me to explain any of these recommendations in more detail?"
+      7. Before ending: "I'll make sure to save these notes for Dr. [Name] to review."
 
       Remember to speak clearly and concisely since this will be spoken by a voice assistant.`,
     functions: [
@@ -91,6 +94,47 @@ export const doctorVapiConfig = {
           },
           required: ['disease', 'age', 'severity', 'symptoms', 'advice', 'nextSteps'],
         },
+      },
+      {
+        name: 'saveConversationNote',
+        description: 'Save a summary of the conversation for the doctor to review',
+        parameters: {
+          type: 'object',
+          properties: {
+            patientName: {
+              type: 'string',
+              description: 'Name of the patient (if provided)'
+            },
+            conversation: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  role: {
+                    type: 'string',
+                    enum: ['assistant', 'patient'],
+                    description: 'Who is speaking'
+                  },
+                  content: {
+                    type: 'string',
+                    description: 'The message content'
+                  },
+                  timestamp: {
+                    type: 'string',
+                    description: 'When the message was sent'
+                  }
+                },
+                required: ['role', 'content', 'timestamp']
+              },
+              description: 'The full conversation transcript'
+            },
+            summary: {
+              type: 'string',
+              description: 'A brief summary of the conversation, including key points, concerns, and recommendations'
+            }
+          },
+          required: ['conversation', 'summary']
+        }
       }
     ],
   },
