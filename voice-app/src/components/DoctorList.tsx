@@ -108,10 +108,19 @@ export default function DoctorList() {
       ...doctorVapiConfig,
       name: `${doctor.name}'s AI Assistant`,
       serverUrl: webhookUrl,
+      model: {
+        ...doctorVapiConfig.model,
+        systemPrompt: doctorVapiConfig.model.systemPrompt
+          .replace('[Doctor\'s Name]', doctor.name)
+          .replace('[Name]', doctor.name)
+          .replace('[Specialty]', doctor.expertise)
+      },
       metadata: {
         ...doctorVapiConfig.metadata,
         doctor: doctor.name,
-        expertise: doctor.expertise
+        expertise: doctor.expertise,
+        doctorName: doctor.name,
+        doctorExpertise: doctor.expertise
       }
     };
 
