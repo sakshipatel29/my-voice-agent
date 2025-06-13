@@ -64,27 +64,16 @@ export default function DoctorList() {
         });
 
         vapiRef.current.on('error', (err: any) => {
-          console.error('❌ Vapi error details:', {
-            message: err.message,
-            status: err.status,
-            data: err.data,
-            type: err.type,
-            url: err.url
-          });
+          console.error('❌ Vapi error details:', err);
           setInCall(false);
           setActiveDoctor(null);
           let errorMessage = 'An error occurred with the voice assistant';
-          
-          if (err.status === 400) {
-            errorMessage = 'Invalid request. Please check your configuration.';
-          } else if (err.status === 401) {
-            errorMessage = 'Authentication failed. Please check your Vapi token.';
-          } else if (err.status === 403) {
-            errorMessage = 'Access denied. Please check your permissions.';
-          } else if (err.message) {
-            errorMessage = err.message;
-          }
-          
+
+          if (err.status === 400) errorMessage = 'Invalid request. Please check your configuration.';
+          else if (err.status === 401) errorMessage = 'Authentication failed. Please check your Vapi token.';
+          else if (err.status === 403) errorMessage = 'Access denied. Please check your permissions.';
+          else if (err.message) errorMessage = err.message;
+
           setError(errorMessage);
         });
       } catch (err) {
@@ -96,7 +85,6 @@ export default function DoctorList() {
 
   const startCall = (doctor: Doctor) => {
     if (!vapiRef.current || inCall) return;
-    console.log('▶️ Start Call button clicked for', doctor.name);
 
     const webhookUrl = process.env.NEXT_PUBLIC_VAPI_WEBHOOK_URL;
     if (!webhookUrl) {
@@ -124,10 +112,8 @@ export default function DoctorList() {
       }
     };
 
-    console.log('Payload:', config);
-    
+    setActiveDoctor(doctor);
     try {
-      setActiveDoctor(doctor);
       vapiRef.current.start(config);
     } catch (err) {
       console.error('Failed to start call:', err);
@@ -137,7 +123,6 @@ export default function DoctorList() {
 
   const stopCall = () => {
     if (vapiRef.current && inCall) {
-      console.log('⛔ Stopping call');
       try {
         vapiRef.current.stop();
       } catch (err) {
@@ -148,66 +133,66 @@ export default function DoctorList() {
   };
 
   return (
-    <div className="doctor-list">
-      <h1 className="doctor-list-title">Home Page</h1>
+    <div className="min-h-screen px-6 py-10 bg-gray-100">
+      <div className="max-w-4xl mx-auto">
+        <h1 className="text-3xl font-bold text-blue-600 mb-4 text-center">Sunrise Hospital</h1>
 
-      <p className="doctor-list-description">
-        Welcome to our hospital portal. Here you can find expert doctors across various specialties. 
-        Use the <span className="font-medium text-blue-600">Call Doctor</span> button to contact a doctor directly for information or consultation. 
-        If the doctor is unavailable, you can connect with their <span className="font-medium text-green-600">AI Assistant</span> for instant support.
-      </p>
+        <p className="text-gray-600 text-center mb-8 max-w-2xl mx-auto">
+          Welcome to our hospital portal. Here you can find expert doctors across various specialties. 
+          Use the <span className="font-medium text-blue-400">Call Doctor</span> button to contact a doctor directly for information or consultation. 
+          If the doctor is unavailable, you can connect with their <span className="font-medium text-green-400">AI Assistant</span> for instant support.
+        </p>
 
-      {error && (
-        <div className="error-card">
-          {error}
-        </div>
-      )}
-
-      <div className="space-y-4">
-        {doctors.map((doc) => (
-          <div
-            key={doc.id}
-            className="doctor-card"
-          >
-            <div className="doctor-info">
-              <div className="doctor-name">{doc.name}</div>
-              <div className="doctor-expertise">{doc.expertise}</div>
-            </div>
-
-            <div className="doctor-actions">
-              <button
-                onClick={() => alert(`Calling ${doc.name}...`)}
-                className="doctor-button button-call"
-              >
-                <FaMicrophoneAlt />
-                Call Doctor
-              </button>
-
-              <button
-                onClick={() => startCall(doc)}
-                disabled={inCall}
-                className={`doctor-button button-ai ${inCall ? 'button-disabled' : ''}`}
-              >
-                <FaMicrophoneAlt />
-                Call AI Assistant
-              </button>
-            </div>
+        {error && (
+          <div className="mb-6 p-4 rounded-md bg-red-100 text-red-700 border border-red-300">
+            {error}
           </div>
-        ))}
-      </div>
+        )}
 
-      {inCall && activeDoctor && (
-        <div className="active-call">
-          <p className="active-call-title">Active Call with {activeDoctor.name}'s AI Assistant</p>
-          <button
-            onClick={stopCall}
-            className="doctor-button button-call"
-          >
-            <FaStop />
-            End Call
-          </button>
+        <div className="space-y-4">
+          {doctors.map((doc) => (
+            <div key={doc.id} className="bg-white rounded-xl shadow-md p-6 flex flex-col md:flex-row items-center justify-between gap-4">
+              <div>
+                <div className="text-lg font-semibold text-gray-900">{doc.name}</div>
+                <div className="text-sm text-gray-500">{doc.expertise}</div>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onClick={() => alert(`Calling ${doc.name}...`)}
+                  className="flex items-center gap-2 px-4 py-2 rounded-full text-white bg-green-400 hover:bg-green-500 text-sm font-medium shadow"
+                >
+                  <FaMicrophoneAlt /> Call Doctor
+                </button>
+
+                <button
+                  onClick={() => startCall(doc)}
+                  disabled={inCall}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-full text-white text-sm font-medium shadow ${
+                    inCall ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-400 hover:bg-blue-500'
+                  }`}
+                >
+                  <FaMicrophoneAlt /> Call AI Assistant
+                </button>
+              </div>
+            </div>
+          ))}
         </div>
-      )}
+
+        {inCall && activeDoctor && (
+          <div className="fixed bottom-6 right-6 bg-white border border-gray-300 shadow-xl rounded-lg p-4 flex items-center gap-4 z-50">
+            <p className="text-sm font-medium text-gray-800">
+              Active Call with {activeDoctor.name}'s AI Assistant
+            </p>
+            <button
+              onClick={stopCall}
+              className="flex items-center gap-2 px-4 py-2 rounded-full text-white bg-red-600 hover:bg-red-700 text-sm font-medium"
+            >
+              <FaStop /> End Call
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   );
-} 
+}

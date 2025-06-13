@@ -6,8 +6,7 @@ import DoctorList from '@/components/DoctorList';
 export default function Home() {
   return (
     <main className="min-h-screen bg-gray-50">
-      <div className="container">
-        <div className="components-grid">
+      <div >
           {/* <div className="component-wrapper">
             <AvailabilityChecker />
           </div>
@@ -17,11 +16,9 @@ export default function Home() {
           <div className="component-wrapper">
             <NoteAdder />
           </div> */}
-          <div className="component-wrapper">
+          
             <DoctorList />
-          </div>
         </div>
-      </div>
     </main>
   );
 }

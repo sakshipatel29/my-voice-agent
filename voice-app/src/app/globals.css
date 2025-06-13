@@ -125,6 +125,7 @@ body {
   max-width: 1280px;
   margin: 0 auto;
   padding: 1rem;
+  background-color: #d7d8da;
 }
 
 .main-content {
@@ -139,6 +140,7 @@ body {
   flex-direction: column;
   gap: 4rem;
   align-items: center;
+  justify-items: center;
   justify-content: center;
   width: 100%;
 }
@@ -584,10 +586,10 @@ body {
 
 /* Doctor List styles */
 .doctor-list {
-  width: 100%;
+  width: 1000px;
   background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(8px);
-  border-radius: 1.5rem;
+  border-radius: 1rem;
   padding: 3rem;
   box-shadow: var(--shadow-xl);
   border: 2px solid var(--border-color);
@@ -717,8 +719,8 @@ body {
 /* Dark mode styles */
 @media (prefers-color-scheme: dark) {
   .doctor-list {
-    background: rgba(17, 24, 39, 0.8);
-    border-color: var(--border-color-dark);
+    background: rgba(156, 157, 157, 0.8);
+    border-color: var(--border-color-light);
   }
 
   .doctor-card {
