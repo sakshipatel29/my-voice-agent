@@ -1,7 +1,7 @@
 import { generateText } from "ai";
 import { google } from "@ai-sdk/google";
 
-import { db } from "@/lib/firebaseAdmin";
+import { db } from "@/firebase/admin";
 
 export async function POST(request: Request) {
     const { disease, age, severity, symptoms, userid, doctorName, doctorExpertise } = await request.json();
