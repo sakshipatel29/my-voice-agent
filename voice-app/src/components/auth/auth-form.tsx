@@ -46,6 +46,7 @@ const AuthForm = ({ type }: { type: FormType }) => {
   });
 
   const onSubmit = async (data: z.infer<typeof formSchema>) => {
+    console.log("Submitting:", data);
     try {
       if (type === "sign-up") {
         const { name, email, password, userType } = data;
@@ -78,12 +79,30 @@ const AuthForm = ({ type }: { type: FormType }) => {
           return;
         }
 
-        await signIn({ email, idToken });
+        const result = await signIn({ email, idToken });
+
+        if (!result.success) {
+          toast.error(result.message);
+          return;
+        }
+
+        // ✅ Set session cookie via API route
+        const sessionRes = await fetch("/api/set-session", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ idToken }),
+        });
+
+        if (!sessionRes.ok) {
+          toast.error("Failed to set session.");
+          return;
+        }
+
         toast.success("Signed in successfully.");
-        router.push("/");
+        router.push("/"); // Reload to reflect updated session
       }
     } catch (error) {
-      console.log(error);
+      console.error("Auth error:", error);
       toast.error(`There was an error: ${error}`);
     }
   };
@@ -174,4 +193,4 @@ const AuthForm = ({ type }: { type: FormType }) => {
   );
 };
 
-export default AuthForm; 
+export default AuthForm;

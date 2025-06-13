@@ -2,14 +2,16 @@
 
 import { auth, db } from "@/firebase/admin";
 import { cookies } from "next/headers";
+import { User } from "@/types";
 
-const SESSION_DURATION = 60 * 60 * 24 * 7 * 30;
+// Set session duration to 2 weeks (maximum allowed by Firebase)
+const SESSION_DURATION = 60 * 60 * 24 * 14; // 14 days in seconds
 
 export async function setSessionCookie(idToken: string) {
   const cookieStore = await cookies();
 
   const sessionCookie = await auth.createSessionCookie(idToken, {
-    expiresIn: SESSION_DURATION * 1000,
+    expiresIn: SESSION_DURATION * 1000, // Convert to milliseconds
   });
 
   cookieStore.set("session", sessionCookie, {
@@ -36,25 +38,48 @@ type SignInParams = {
 
 export const signUp = async (params: SignUpParams) => {
   try {
-    // Add your sign up logic here
+    // Save user data to Firestore
+    await db.collection("users").doc(params.uid).set({
+      name: params.name,
+      email: params.email,
+      userType: params.userType,
+      createdAt: new Date().toISOString()
+    });
+
     return { success: true, message: "Success" };
   } catch (error) {
+    console.error("Sign up error:", error);
     return { success: false, message: "Failed to sign up" };
   }
 };
 
 export const signIn = async (params: SignInParams) => {
   try {
-    // Add your sign in logic here
+    // Get user data from Firebase Auth
+    const userRecord = await auth.getUserByEmail(params.email);
+    
+    // Get user data from Firestore
+    const userDoc = await db.collection("users").doc(userRecord.uid).get();
+    
+    if (!userDoc.exists) {
+      // If user doesn't exist in Firestore, create it
+      await db.collection("users").doc(userRecord.uid).set({
+        name: userRecord.displayName || "",
+        email: userRecord.email,
+        userType: "patient", // Default to patient if not specified
+        createdAt: new Date().toISOString()
+      });
+    }
+
     return { success: true, message: "Success" };
   } catch (error) {
+    console.error("Sign in error:", error);
     return { success: false, message: "Failed to sign in" };
   }
 };
 
 export async function signOut() {
   const cookieStore = await cookies();
-
   cookieStore.delete("session");
 }
 
@@ -78,10 +103,11 @@ export async function getCurrentUser(): Promise<User | null> {
       id: userRecord.id,
     } as User;
   } catch (error) {
-    console.log(error);
+    console.error("Get current user error:", error);
     return null;
   }
 }
+
 export async function isAuthenticated() {
   const user = await getCurrentUser();
   return !!user;

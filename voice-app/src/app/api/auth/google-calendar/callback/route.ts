@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getOAuthClient } from '@/lib/googleOAuth';
-import { db } from '@/lib/firebaseAdmin';
+import { db } from '@/firebase/admin';
 
 export async function GET(req: NextRequest) {
   const searchParams = req.nextUrl.searchParams;

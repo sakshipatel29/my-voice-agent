@@ -1,7 +1,7 @@
 // src/app/api/vapi-webhook/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { google } from 'googleapis';
-import { db } from '@/lib/firebaseAdmin';
+import { db } from '@/firebase/admin';
 import { getOAuthClient } from '@/lib/googleOAuth';
 import { addHours, parseISO, formatISO } from 'date-fns';
 

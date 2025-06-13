@@ -1,5 +1,5 @@
 import { google } from 'googleapis';
-import { db } from '@/lib/firebaseAdmin';
+import { db } from '@/firebase/admin';
 import { NextRequest, NextResponse } from 'next/server';
 
 // Helper to create OAuth client
