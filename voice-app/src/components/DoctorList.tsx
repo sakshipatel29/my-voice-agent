@@ -13,8 +13,18 @@ interface Doctor {
   expertise: string;
 }
 
+interface Message {
+  role: 'assistant' | 'patient';
+  content: string;
+  timestamp: string;
+}
+
+interface User {
+  name: string;
+}
+
 const doctors: Doctor[] = [
-  { id: '1', name: 'Dr. Sarah Johnson', expertise: 'Cardiology' },
+  { id: '1', name: 'Dr. Sara Johnson', expertise: 'Cardiology' },
   { id: '2', name: 'Dr. Michael Chen', expertise: 'Neurology' },
   { id: '3', name: 'Dr. Emily Rodriguez', expertise: 'Pediatrics' },
   { id: '4', name: 'Dr. James Wilson', expertise: 'Orthopedics' },
@@ -31,12 +41,19 @@ export default function DoctorList() {
   const [activeDoctor, setActiveDoctor] = useState<Doctor | null>(null);
   const [inCall, setInCall] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [messages, setMessages] = useState<{ role: 'assistant' | 'patient'; content: string; timestamp: string }[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
   const [showAvailability, setShowAvailability] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
 
   useEffect(() => {
+    // Fetch current user data
+    fetch('/api/current-user')
+      .then((res) => res.json())
+      .then((data) => setUser(data))
+      .catch((error) => console.error('Failed to fetch user:', error));
+
     const token = process.env.NEXT_PUBLIC_VAPI_WEB_TOKEN;
     if (!token) {
       setError('Vapi token is not configured.');
@@ -171,7 +188,7 @@ export default function DoctorList() {
     }
   };
 
-  const extractPatientName = (messages: { role: 'assistant' | 'patient'; content: string; timestamp: string }[]): string => {
+  const extractPatientName = (messages: Message[]): string => {
     // Look for patterns where the patient introduces themselves
     for (let i = 0; i < messages.length; i++) {
       const msg = messages[i];
@@ -195,20 +212,135 @@ export default function DoctorList() {
     return 'Unknown';
   };
 
+  const extractDisease = (messages: Message[]): string => {
+    for (const msg of messages) {
+      if (msg.role === 'patient') {
+        const content = msg.content.toLowerCase();
+        // Look for common disease/condition indicators
+        if (content.includes('pain') || 
+            content.includes('problem') || 
+            content.includes('condition') || 
+            content.includes('issue') || 
+            content.includes('suffering from') ||
+            content.includes('diagnosed with')) {
+          return msg.content;
+        }
+      }
+    }
+    return 'Not specified';
+  };
+
+  const extractAge = (messages: Message[]): string => {
+    for (const msg of messages) {
+      if (msg.role === 'patient') {
+        // Look for age patterns like "I am X years old" or "I'm X"
+        const ageMatch = msg.content.match(/(?:i am|i'm|age is|my age is)\s+(\d+)(?:\s+years?)?/i);
+        if (ageMatch) {
+          return ageMatch[1];
+        }
+        // Also look for direct number mentions
+        const directAgeMatch = msg.content.match(/\b(\d{1,2})\b/);
+        if (directAgeMatch) {
+          return directAgeMatch[1];
+        }
+      }
+    }
+    return 'Not specified';
+  };
+
+  const extractSymptoms = (messages: Message[]): string => {
+    const symptoms: string[] = [];
+    for (const msg of messages) {
+      if (msg.role === 'patient') {
+        const content = msg.content.toLowerCase();
+        // Look for symptom indicators
+        if (content.includes('symptom') || 
+            content.includes('feeling') || 
+            content.includes('experiencing') || 
+            content.includes('having') ||
+            content.includes('suffering from') ||
+            content.includes('pain') ||
+            content.includes('ache') ||
+            content.includes('discomfort')) {
+          symptoms.push(msg.content);
+        }
+      }
+    }
+    return symptoms.length > 0 ? symptoms.join(', ') : 'Not specified';
+  };
+
+  const extractAdvice = (messages: Message[]): string => {
+    const advice: string[] = [];
+    for (const msg of messages) {
+      if (msg.role === 'assistant') {
+        const content = msg.content.toLowerCase();
+        // Look for advice indicators
+        if (content.includes('recommend') || 
+            content.includes('advise') || 
+            content.includes('suggest') || 
+            content.includes('should') ||
+            content.includes('would suggest') ||
+            content.includes('would recommend')) {
+          // Remove the indicator words to get cleaner advice
+          const cleanAdvice = msg.content
+            .replace(/^(i would suggest|i would recommend|i recommend|i suggest|you should|i advise)/i, '')
+            .trim();
+          if (cleanAdvice && !advice.includes(cleanAdvice)) {
+            advice.push(cleanAdvice);
+          }
+        }
+      }
+    }
+    return advice.length > 0 ? advice.join(', ') : 'Not specified';
+  };
+
+  const extractNextSteps = (messages: Message[]): string => {
+    const steps: string[] = [];
+    for (const msg of messages) {
+      if (msg.role === 'assistant') {
+        const content = msg.content.toLowerCase();
+        // Look for next steps indicators
+        if (content.includes('next step') || 
+            content.includes('follow up') || 
+            content.includes('schedule') || 
+            content.includes('appointment') ||
+            content.includes('visit') ||
+            content.includes('see a doctor') ||
+            content.includes('make an appointment')) {
+          steps.push(msg.content);
+        }
+      }
+    }
+    return steps.length > 0 ? steps.join(', ') : 'Not specified';
+  };
+
+  const extractSeverity = (messages: Message[]): string => {
+    for (const msg of messages) {
+      if (msg.role === 'patient') {
+        const content = msg.content.toLowerCase();
+        if (content.includes('severe') || content.includes('very bad') || content.includes('extreme')) {
+          return 'Severe';
+        } else if (content.includes('mild') || content.includes('slight') || content.includes('minor')) {
+          return 'Mild';
+        }
+      }
+    }
+    return 'Moderate'; // Default to moderate if not specified
+  };
+
   const saveConsultation = async () => {
-    if (!activeDoctor || messages.length === 0) return;
+    if (!activeDoctor || messages.length === 0 || !user) return;
     
     setIsSaving(true);
     try {
-      // Extract patient name from the conversation
-      const patientName = extractPatientName(messages);
+      const patientName = user.name;
       
       // Extract consultation details from the conversation
       const consultation = {
         disease: extractDisease(messages),
         age: extractAge(messages),
         symptoms: extractSymptoms(messages),
-        severity: 'Moderate', // Default value, could be extracted from conversation
+        severity: extractSeverity(messages),
         advice: extractAdvice(messages),
         nextSteps: extractNextSteps(messages),
       };
@@ -241,70 +373,6 @@ export default function DoctorList() {
     } finally {
       setIsSaving(false);
     }
-  };
-
-  // Helper functions to extract information from the conversation
-  const extractDisease = (messages: { role: 'assistant' | 'patient'; content: string; timestamp: string }[]): string => {
-    for (const msg of messages) {
-      if (msg.role === 'patient') {
-        const content = msg.content.toLowerCase();
-        if (content.includes('pain') || content.includes('problem') || content.includes('condition')) {
-          return msg.content;
-        }
-      }
-    }
-    return 'Not specified';
-  };
-
-  const extractAge = (messages: { role: 'assistant' | 'patient'; content: string; timestamp: string }[]): string => {
-    for (const msg of messages) {
-      if (msg.role === 'patient') {
-        const ageMatch = msg.content.match(/(\d+)\s*(?:year|yr)s?/i);
-        if (ageMatch) {
-          return ageMatch[1];
-        }
-      }
-    }
-    return 'Not specified';
-  };
-
-  const extractSymptoms = (messages: { role: 'assistant' | 'patient'; content: string; timestamp: string }[]): string => {
-    const symptoms: string[] = [];
-    for (const msg of messages) {
-      if (msg.role === 'patient') {
-        const content = msg.content.toLowerCase();
-        if (content.includes('pain') || content.includes('symptom') || content.includes('feeling')) {
-          symptoms.push(msg.content);
-        }
-      }
-    }
-    return symptoms.length > 0 ? symptoms.join(', ') : 'Not specified';
-  };
-
-  const extractAdvice = (messages: { role: 'assistant' | 'patient'; content: string; timestamp: string }[]): string => {
-    const advice: string[] = [];
-    for (const msg of messages) {
-      if (msg.role === 'assistant') {
-        const content = msg.content.toLowerCase();
-        if (content.includes('recommend') || content.includes('advise') || content.includes('suggest')) {
-          advice.push(msg.content);
-        }
-      }
-    }
-    return advice.length > 0 ? advice.join(', ') : 'Not specified';
-  };
-
-  const extractNextSteps = (messages: { role: 'assistant' | 'patient'; content: string; timestamp: string }[]): string => {
-    const steps: string[] = [];
-    for (const msg of messages) {
-      if (msg.role === 'assistant') {
-        const content = msg.content.toLowerCase();
-        if (content.includes('next') || content.includes('follow') || content.includes('should')) {
-          steps.push(msg.content);
-        }
-      }
-    }
-    return steps.length > 0 ? steps.join(', ') : 'Not specified';
   };
 
   return (
@@ -400,15 +468,29 @@ export default function DoctorList() {
 
         {!inCall && messages.length > 0 && (
           <div className="fixed bottom-6 right-6 bg-white border border-gray-300 shadow-xl rounded-lg p-4 flex items-center gap-4 z-50">
-            <Button
-              onClick={saveConsultation}
-              disabled={isSaving}
-              className={`flex items-center gap-2 px-4 py-2 rounded-full text-white text-sm font-medium ${
-                isSaving ? 'bg-gray-400 cursor-not-allowed' : 'bg-green-600 hover:bg-green-700'
-              }`}
-            >
-              {isSaving ? 'Saving...' : 'Save Consultation'}
-            </Button>
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => {
+                  setMessages([]);
+                  setActiveDoctor(null);
+                }}
+                className="text-gray-500 hover:text-gray-700 transition-colors"
+                title="Cancel and clear conversation"
+              >
+                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+              <Button
+                onClick={saveConsultation}
+                disabled={isSaving}
+                className={`flex items-center gap-2 px-4 py-2 rounded-full text-white text-sm font-medium ${
+                  isSaving ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
+                }`}
+              >
+                {isSaving ? 'Saving...' : 'Save Consultation'}
+              </Button>
+            </div>
           </div>
         )}
       </div>

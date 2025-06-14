@@ -67,7 +67,7 @@ export default function Consultations({ userId, role }: Props) {
         >
           <div className="mb-2">
             <h2 className="text-xl font-semibold text-gray-800">
-              Consultation {role === 'doctor' ? `with ${entry.patientName}` : `with ${entry.doctorName}`}
+              Consultation {role === 'doctor' ? `with ${entry.patientName}` : `with Dr. ${entry.doctorName}`}
             </h2>
             <p className="text-sm text-gray-500">
               {new Date(entry.createdAt).toLocaleString()} | Specialty: {entry.doctorExpertise}

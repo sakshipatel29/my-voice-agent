@@ -10,12 +10,17 @@ export async function POST(req: NextRequest) {
     const {
       doctorName,
       doctorExpertise,
-      patientName = 'Unknown',
+      patientName,
       consultation = null,
       transcript = [],
       summary = '',
     } = body;
 
+    if (!patientName) {
+      return NextResponse.json({ success: false, error: 'Patient name is required' }, { status: 400 });
+    }
+
+    const now = new Date();
     const docRef = await db.collection('consultations').add({
       doctorName,
       doctorExpertise,
@@ -23,7 +28,8 @@ export async function POST(req: NextRequest) {
       consultation,
       transcript,
       summary,
-      createdAt: new Date().toISOString(),
+      createdAt: now.toISOString(),
+      date: now.toISOString().split('T')[0], // Add date field in YYYY-MM-DD format
     });
 
     console.log("✅ Firestore write successful:", docRef.id);
