@@ -129,7 +129,7 @@ export default function Home() {
             {/* Emergency Contact */}
             <div>
               <h3 className="text-lg font-semibold text-blue-400 mb-4">Emergency Contact</h3>
-              <div className="bg-red-600 text-white p-4 rounded-lg">
+              <div className="bg-red-500 text-white p-4 rounded-lg">
                 <p className="font-bold text-xl mb-2">24/7 Emergency</p>
                 <p className="text-2xl font-bold">(555) 911-9111</p>
                 <p className="text-sm mt-2">Available round the clock for emergency services</p>

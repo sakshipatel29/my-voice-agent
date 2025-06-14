@@ -5,13 +5,13 @@ export const metadata: Metadata = {
   title: 'Doctor Consultation History',
 };
 
-type DoctorPageProps = {
+type PageProps = {
   params: {
     id: string;
   };
 };
 
-export default async function DoctorPage({ params }: DoctorPageProps) {
+export default function DoctorPage({ params }: PageProps) {
   const doctorName = decodeURIComponent(params.id);
 
   return (
