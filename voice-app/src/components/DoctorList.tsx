@@ -379,7 +379,6 @@ export default function DoctorList() {
   return (
     <div className="min-h-screen px-6 py-10 bg-gray-100">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-3xl font-bold text-blue-600 mb-4 text-center">Sunrise Hospital</h1>
 
         <p className="text-gray-600 text-center mb-8 max-w-2xl mx-auto">
           Welcome to our hospital portal. Here you can find expert doctors across various specialties. 

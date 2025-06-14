@@ -99,7 +99,8 @@ const AuthForm = ({ type }: { type: FormType }) => {
         }
 
         toast.success("Signed in successfully.");
-        router.push("/"); // Reload to reflect updated session
+        // Force a hard refresh to update the session state
+        window.location.href = "/";
       }
     } catch (error) {
       console.error("Auth error:", error);
@@ -110,17 +111,17 @@ const AuthForm = ({ type }: { type: FormType }) => {
   const isSignIn = type === "sign-in";
 
   return (
-    <div className="card-border w-full max-w-sm mx-auto">
-      <div className="card px-6 py-10 flex flex-col gap-6">
-        <div className="text-center space-y-1">
-          <h2 className="text-lg font-semibold text-user-primary">Echo Mate</h2>
-          <h3 className="text-sm text-user-primary">AI Voice Executive Assistant</h3>
+    <div className="card-border w-full max-w-md mx-auto">
+      <div className="card px-8 py-12 flex flex-col gap-8">
+        <div className="text-center space-y-2">
+          <h2 className="text-2xl font-bold text-user-primary">Sunrise</h2>
+          <h3 className="text-lg text-user-primary">Medical Hospital</h3>
         </div>
 
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className="space-y-5 w-full form"
+            className="space-y-6 w-full form"
           >
             {!isSignIn && (
               <>
@@ -131,8 +132,8 @@ const AuthForm = ({ type }: { type: FormType }) => {
                   placeholder="Your Name"
                   type="text"
                 />
-                <div className="space-y-2">
-                  <label className="label text-user-primary">User Type</label>
+                <div className="space-y-3">
+                  <label className="label text-user-primary text-lg">User Type</label>
                   <Controller
                     control={form.control}
                     name="userType"
@@ -140,15 +141,15 @@ const AuthForm = ({ type }: { type: FormType }) => {
                       <RadioGroup
                         onValueChange={field.onChange}
                         defaultValue={field.value}
-                        className="flex gap-4"
+                        className="flex gap-6"
                       >
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="patient" id="patient" />
-                          <label htmlFor="patient" className="text-black">Patient</label>
+                        <div className="flex items-center space-x-3">
+                          <RadioGroupItem value="patient" id="patient" className="w-5 h-5" />
+                          <label htmlFor="patient" className="text-black text-lg">Patient</label>
                         </div>
-                        <div className="flex items-center space-x-2">
-                          <RadioGroupItem value="doctor" id="doctor" />
-                          <label htmlFor="doctor" className="text-black">Doctor</label>
+                        <div className="flex items-center space-x-3">
+                          <RadioGroupItem value="doctor" id="doctor" className="w-5 h-5" />
+                          <label htmlFor="doctor" className="text-black text-lg">Doctor</label>
                         </div>
                       </RadioGroup>
                     )}
@@ -173,17 +174,17 @@ const AuthForm = ({ type }: { type: FormType }) => {
               type="password"
             />
 
-            <Button className="btn w-full min-h-10 text-sm" type="submit">
+            <Button className="btn w-full min-h-12 text-lg font-semibold" type="submit">
               {isSignIn ? "Sign In" : "Create an Account"}
             </Button>
           </form>
         </Form>
 
-        <p className="text-center text-sm text-black">
+        <p className="text-center text-base text-black">
           {isSignIn ? "No account yet?" : "Already have an account?"}
           <Link
             href={!isSignIn ? "/sign-in" : "/sign-up"}
-            className="ml-1 font-semibold text-black hover:underline"
+            className="ml-2 font-semibold text-black hover:underline"
           >
             {!isSignIn ? "Sign In" : "Sign Up"}
           </Link>

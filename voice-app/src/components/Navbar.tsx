@@ -38,74 +38,56 @@ export default function Navbar() {
     }
   };
 
+  // Don't render navbar if user is not logged in
+  if (!user) {
+    return null;
+  }
+
   return (
     <>
       <nav className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center gap-2">
-              <Link href="/" className="text-xl font-bold text-blue-400 hover:text-blue-600 transition flex  items-center gap-2">
-                <FaHospital className="h-6 w-6" />
+          <div className="flex justify-between items-center h-20">
+            <div className="flex items-center gap-6">
+              <Link href="/" className="text-xl font-bold text-blue-400 hover:text-blue-600 transition flex items-center gap-2">
+                <FaHospital className="h-8 w-8" />
               </Link>
-              {user && (
+              <Link
+                href={`/${user.userType}s/${encodeURIComponent(user.name)}`}
+                className="text-sm font-small text-gray-700 hover:text-gray-900 transition border-2 border-blue-400 rounded-lg px-4 py-2 hover:border-blue-600"
+              >
+                Consultations
+              </Link>
+              {user.userType === 'doctor' && (
                 <>
                   <Link
-                    href={`/${user.userType}s/${encodeURIComponent(user.name)}`}
-                    className="text-sm font-small text-gray-700 hover:text-gray-900 transition border-2 border-blue-400 rounded-lg px-4 py-2 hover:border-blue-600"
+                    href="/api/auth/google-calendar"
+                    className="flex text-sm font-small text-gray-700 hover:text-gray-900 transition border-2 border-green-400 rounded-lg px-4 py-2 hover:border-green-600 gap-2"
                   >
-                    Consultations
+                    Connect Calendar
+                    <FaCalendarAlt className="h-4 w-4"/>
                   </Link>
-                  {user.userType === 'doctor' && (
-                    <>
-                      <Link
-                        href="/api/auth/google-calendar"
-                        className="flex text-sm font-small text-gray-700 hover:text-gray-900 transition border-2 border-green-400 rounded-lg px-4 py-2 hover:border-green-600 gap-2"
-                      >
-                        Connect Calendar
-                        <FaCalendarAlt className="h-4 w-4"/>
-                      </Link>
-                      <button
-                        onClick={() => setShowUpdateModal(true)}
-                        className="text-sm font-small text-gray-700 hover:text-gray-900 transition border-2 border-purple-400 rounded-lg px-4 py-2 hover:border-purple-600 flex items-center gap-2"
-                      >
-                        <FaMicrophoneAlt className="h-4 w-4" />
-                        Get Daily Update
-                      </button>
-                    </>
-                  )}
+                  <button
+                    onClick={() => setShowUpdateModal(true)}
+                    className="text-sm font-small text-gray-700 hover:text-gray-900 transition border-2 border-purple-400 rounded-lg px-4 py-2 hover:border-purple-600 flex items-center gap-2"
+                  >
+                    <FaMicrophoneAlt className="h-4 w-4" />
+                    Get Daily Update
+                  </button>
                 </>
               )}
             </div>
 
-            <div>
-              {user ? (
-                <div className="flex items-center gap-4">
-                  <span className="text-gray-600 font-medium">
-                    Welcome to the Hospital's Portal, <span className="text-blue-400">{user.name}</span>
-                  </span>
-                  <button
-                    onClick={handleLogout}
-                    className="text-sm font-medium text-white bg-red-500 px-4 py-2 rounded-md hover:bg-red-600 transition"
-                  >
-                    Logout
-                  </button>
-                </div>
-              ) : (
-                <div className="flex items-center space-x-4">
-                  <Link
-                    href="/sign-in"
-                    className="text-sm font-medium text-gray-700 hover:text-gray-900 transition"
-                  >
-                    Sign in
-                  </Link>
-                  <Link
-                    href="/sign-up"
-                    className="text-sm font-medium text-white bg-blue-400 px-4 py-2 rounded-md hover:bg-blue-500 transition"
-                  >
-                    Sign up
-                  </Link>
-                </div>
-              )}
+            <div className="flex items-center gap-4">
+              <span className="text-gray-600 font-medium">
+                Welcome to the Hospital's Portal, <span className="text-blue-400">{user.name}</span>
+              </span>
+              <button
+                onClick={handleLogout}
+                className="text-sm font-medium text-white bg-red-500 px-4 py-2 rounded-md hover:bg-red-600 transition"
+              >
+                Logout
+              </button>
             </div>
           </div>
         </div>
