@@ -51,31 +51,6 @@ export default function Consultations({ userId, role }: Props) {
     fetchConsultations();
   }, [userId, role]);
 
-  const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this consultation?')) {
-      return;
-    }
-
-    setDeletingId(id);
-    try {
-      const res = await fetch(`/api/consultations/${id}`, {
-        method: 'DELETE',
-      });
-
-      if (!res.ok) {
-        throw new Error('Failed to delete consultation');
-      }
-
-      // Remove the deleted consultation from the state
-      setData(data.filter(entry => entry.id !== id));
-    } catch (err) {
-      console.error('Failed to delete consultation:', err);
-      alert('Failed to delete consultation. Please try again.');
-    } finally {
-      setDeletingId(null);
-    }
-  };
-
   if (loading) {
     return <p className="text-center text-gray-500">Loading consultations...</p>;
   }
