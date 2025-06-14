@@ -33,6 +33,7 @@ interface Props {
 export default function Consultations({ userId, role }: Props) {
   const [data, setData] = useState<ConsultationEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchConsultations = async () => {
@@ -50,6 +51,31 @@ export default function Consultations({ userId, role }: Props) {
     fetchConsultations();
   }, [userId, role]);
 
+  const handleDelete = async (id: string) => {
+    if (!confirm('Are you sure you want to delete this consultation?')) {
+      return;
+    }
+
+    setDeletingId(id);
+    try {
+      const res = await fetch(`/api/consultations/${id}`, {
+        method: 'DELETE',
+      });
+
+      if (!res.ok) {
+        throw new Error('Failed to delete consultation');
+      }
+
+      // Remove the deleted consultation from the state
+      setData(data.filter(entry => entry.id !== id));
+    } catch (err) {
+      console.error('Failed to delete consultation:', err);
+      alert('Failed to delete consultation. Please try again.');
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
   if (loading) {
     return <p className="text-center text-gray-500">Loading consultations...</p>;
   }
@@ -65,13 +91,22 @@ export default function Consultations({ userId, role }: Props) {
           key={entry.id}
           className="bg-white shadow-md border border-gray-200 rounded-lg p-6"
         >
-          <div className="mb-2">
-            <h2 className="text-xl font-semibold text-gray-800">
-              Consultation {role === 'doctor' ? `with ${entry.patientName}` : `with Dr. ${entry.doctorName}`}
-            </h2>
-            <p className="text-sm text-gray-500">
-              {new Date(entry.createdAt).toLocaleString()} | Specialty: {entry.doctorExpertise}
-            </p>
+          <div className="flex justify-between items-start mb-2">
+            <div>
+              <h2 className="text-xl font-semibold text-gray-800">
+                Consultation {role === 'doctor' ? `with ${entry.patientName}` : `with Dr. ${entry.doctorName}`}
+              </h2>
+              <p className="text-sm text-gray-500">
+                {new Date(entry.createdAt).toLocaleString()} | Specialty: {entry.doctorExpertise}
+              </p>
+            </div>
+            <button
+              onClick={() => handleDelete(entry.id)}
+              disabled={deletingId === entry.id}
+              className="px-3 py-1 text-sm text-red-600 hover:text-red-800 hover:bg-red-50 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {deletingId === entry.id ? 'Deleting...' : 'Delete'}
+            </button>
           </div>
 
           <div className="grid gap-2 text-sm text-gray-700">
