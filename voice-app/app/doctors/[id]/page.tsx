@@ -5,14 +5,13 @@ export const metadata: Metadata = {
   title: 'Doctor Consultation History',
 };
 
-// ✅ Correct way to define props for dynamic route in App Router
-type Props = {
+type DoctorPageProps = {
   params: {
     id: string;
   };
 };
 
-export default async function DoctorPage({ params }: Props) {
+export default async function DoctorPage({ params }: DoctorPageProps) {
   const doctorName = decodeURIComponent(params.id);
 
   return (
@@ -24,4 +23,3 @@ export default async function DoctorPage({ params }: Props) {
     </div>
   );
 }
-
