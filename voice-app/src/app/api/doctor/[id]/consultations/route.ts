@@ -1,14 +1,19 @@
 import { db } from '@/firebase/admin';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
-export async function GET(
-  _req: Request,
-  { params }: { params: { id: string } }
-) {
+export async function GET(req: NextRequest) {
   try {
+    const url = new URL(req.url);
+    const segments = url.pathname.split('/');
+    const doctorId = segments[segments.indexOf('doctor') + 1];
+
+    if (!doctorId) {
+      return NextResponse.json({ error: 'Doctor ID is missing' }, { status: 400 });
+    }
+
     const snapshot = await db
       .collection('consultations')
-      .where('doctorName', '==', decodeURIComponent(params.id))
+      .where('doctorName', '==', decodeURIComponent(doctorId))
       .get();
 
     const consultations = snapshot.docs.map(doc => ({
