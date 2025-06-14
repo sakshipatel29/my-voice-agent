@@ -380,11 +380,17 @@ export default function DoctorList() {
     <div className="min-h-screen px-6 py-10 bg-gray-100">
       <div className="max-w-4xl mx-auto">
 
-        <p className="text-gray-600 text-center mb-8 max-w-2xl mx-auto">
-          Welcome to our hospital portal. Here you can find expert doctors across various specialties. 
-          Use the <span className="font-medium text-blue-400">Call Doctor</span> button to contact a doctor directly for information or consultation. 
-          If the doctor is unavailable, you can connect with their <span className="font-medium text-green-400">AI Assistant</span> for instant support.
-          Check their <span className="font-medium text-purple-400">availability</span> to schedule an appointment.
+        <p className="text-gray-600 text-justify mb-8 max-w-2xl mx-auto">
+          Welcome to our hospital portal, your one-stop destination for comprehensive healthcare services. 
+          Here you can find expert doctors across various specialties, each with years of experience and specialized training. 
+          Use the <span className="font-medium text-blue-400">Call Doctor</span> button to contact a doctor directly for information, 
+          consultation, or to discuss your medical concerns. If the doctor is unavailable, you can connect with their 
+          <span className="font-medium text-green-400">AI Assistant</span> for instant support, medical advice, and preliminary 
+          assessments. Our AI assistants are trained to provide accurate information and can help with appointment scheduling, 
+          medication reminders, and basic health queries. Check their <span className="font-medium text-purple-400">availability</span> 
+          to schedule an appointment at your convenience. Our portal also offers secure access to your medical records, 
+          prescription history, and upcoming appointments. Rest assured, all your interactions are private and protected 
+          under strict medical confidentiality protocols.
         </p>
 
         {error && (
