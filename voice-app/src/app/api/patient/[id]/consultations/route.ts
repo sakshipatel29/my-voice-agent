@@ -1,10 +1,13 @@
-// src/app/api/patient/[id]/consultations/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/firebase/admin';
 
-export async function GET(req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(req: NextRequest) {
   try {
-    const patientName = decodeURIComponent(params.id);
+    const url = new URL(req.url);
+    const segments = url.pathname.split('/');
+    const patientId = segments[segments.indexOf('patient') + 1];
+    const patientName = decodeURIComponent(patientId);
+
     console.log('🔍 Fetching consultations for patient:', patientName);
 
     const snapshot = await db
@@ -28,6 +31,12 @@ export async function GET(req: NextRequest, { params }: { params: { id: string }
       console.error('Error details:', error.message);
       console.error('Error stack:', error.stack);
     }
-    return NextResponse.json({ error: 'Server error', details: error instanceof Error ? error.message : 'Unknown error' }, { status: 500 });
+    return NextResponse.json(
+      {
+        error: 'Server error',
+        details: error instanceof Error ? error.message : 'Unknown error',
+      },
+      { status: 500 }
+    );
   }
 }
