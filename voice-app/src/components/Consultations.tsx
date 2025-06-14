@@ -100,13 +100,13 @@ export default function Consultations({ userId, role }: Props) {
                 {new Date(entry.createdAt).toLocaleString()} | Specialty: {entry.doctorExpertise}
               </p>
             </div>
-            <button
+            {/* <button
               onClick={() => handleDelete(entry.id)}
               disabled={deletingId === entry.id}
               className="px-3 py-1 text-sm text-red-600 hover:text-red-800 hover:bg-red-50 rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {deletingId === entry.id ? 'Deleting...' : 'Delete'}
-            </button>
+            </button> */}
           </div>
 
           <div className="grid gap-2 text-sm text-gray-700">
