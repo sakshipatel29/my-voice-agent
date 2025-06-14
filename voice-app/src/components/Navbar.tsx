@@ -45,12 +45,22 @@ export default function Navbar() {
               <FaHospital className="h-8 w-8" />
             </Link>
             {user && (
-              <Link
-                href={`/${user.userType}s/${encodeURIComponent(user.name)}`}
-                className="text-sm font-medium text-gray-700 hover:text-gray-900 transition border-2 border-blue-400 rounded-lg px-4 py-2 hover:border-blue-600"
-              >
-                Consultations
-              </Link>
+              <>
+                <Link
+                  href={`/${user.userType}s/${encodeURIComponent(user.name)}`}
+                  className="text-sm font-medium text-gray-700 hover:text-gray-900 transition border-2 border-blue-400 rounded-lg px-4 py-2 hover:border-blue-600"
+                >
+                  Consultations
+                </Link>
+                {user.userType === 'doctor' && (
+                  <Link
+                    href="/api/auth/google-calendar"
+                    className="text-sm font-medium text-gray-700 hover:text-gray-900 transition border-2 border-green-400 rounded-lg px-4 py-2 hover:border-green-600"
+                  >
+                    Connect Calendar
+                  </Link>
+                )}
+              </>
             )}
           </div>
 

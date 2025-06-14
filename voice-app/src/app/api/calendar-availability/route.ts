@@ -65,12 +65,15 @@ export async function POST(req: NextRequest) {
     const busy = result.data.calendars?.primary?.busy || [];
     const isFree = busy.length === 0;
 
+    // Get doctor's name from the user data
+    const doctorName = userData.name || 'The doctor';
+
     return NextResponse.json({
       available: isFree,
       busySlots: busy,
       message: isFree
-        ? 'User is available during that time.'
-        : 'User is busy during that time.',
+        ? `${doctorName} is available during that time.`
+        : `${doctorName} is busy during that time.`,
     });
   } catch (err: any) {
     console.error('[Calendar Check Error]', err.message);

@@ -2,9 +2,10 @@
 
 import { useRef, useEffect, useState } from 'react';
 import { getVapi } from '@/lib/vapi.client';
-import { FaMicrophoneAlt, FaStop } from 'react-icons/fa';
+import { FaMicrophoneAlt, FaStop, FaCalendarAlt } from 'react-icons/fa';
 import { doctorVapiConfig } from '@/lib/doctor-vapi';
 import { Button } from './ui/button';
+import AvailabilityChecker from './AvailabilityChecker';
 
 interface Doctor {
   id: string;
@@ -32,6 +33,8 @@ export default function DoctorList() {
   const [error, setError] = useState<string | null>(null);
   const [messages, setMessages] = useState<{ role: 'assistant' | 'patient'; content: string; timestamp: string }[]>([]);
   const [isSaving, setIsSaving] = useState(false);
+  const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
+  const [showAvailability, setShowAvailability] = useState(false);
 
   useEffect(() => {
     const token = process.env.NEXT_PUBLIC_VAPI_WEB_TOKEN;
@@ -313,6 +316,7 @@ export default function DoctorList() {
           Welcome to our hospital portal. Here you can find expert doctors across various specialties. 
           Use the <span className="font-medium text-blue-400">Call Doctor</span> button to contact a doctor directly for information or consultation. 
           If the doctor is unavailable, you can connect with their <span className="font-medium text-green-400">AI Assistant</span> for instant support.
+          Check their <span className="font-medium text-purple-400">availability</span> to schedule an appointment.
         </p>
 
         {error && (
@@ -346,10 +350,39 @@ export default function DoctorList() {
                 >
                   <FaMicrophoneAlt /> Call AI Assistant
                 </button>
+
+                <button
+                  onClick={() => {
+                    setSelectedDoctor(doc);
+                    setShowAvailability(true);
+                  }}
+                  className="flex items-center gap-2 px-4 py-2 rounded-full text-white bg-purple-400 hover:bg-purple-500 text-sm font-medium shadow"
+                >
+                  <FaCalendarAlt /> Check Availability
+                </button>
               </div>
             </div>
           ))}
         </div>
+
+        {showAvailability && selectedDoctor && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+            <div className="bg-white rounded-lg p-6 max-w-2xl w-full mx-4">
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-semibold text-gray-900">
+                  Check {selectedDoctor.name}'s Availability
+                </h2>
+                <button
+                  onClick={() => setShowAvailability(false)}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  ✕
+                </button>
+              </div>
+              <AvailabilityChecker doctorName={selectedDoctor.name} />
+            </div>
+          </div>
+        )}
 
         {inCall && activeDoctor && (
           <div className="fixed bottom-6 right-6 bg-white border border-gray-300 shadow-xl rounded-lg p-4 flex items-center gap-4 z-50">
