@@ -1,3 +1,4 @@
+import Image from 'next/image';
 // import AvailabilityChecker from '@/components/AvailabilityChecker';
 // import VoiceAssistant from '@/components/VoiceAssistant';
 // import NoteAdder from '@/components/NoteAdder';
@@ -16,8 +17,16 @@ export default function Home() {
           <div className="component-wrapper">
             <NoteAdder />
           </div> */}
-          
+            <>
+            <Image
+              src="/images/hospital-2.jpg"
+              alt="Animated Hospital"
+              width={900}
+              height={300}
+              className="mx-auto my-8 shadow-lg"
+            />
             <DoctorList />
+            </>
         </div>
     </main>
   );

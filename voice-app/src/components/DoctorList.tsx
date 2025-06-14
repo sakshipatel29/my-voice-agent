@@ -6,6 +6,7 @@ import { FaMicrophoneAlt, FaStop, FaCalendarAlt } from 'react-icons/fa';
 import { doctorVapiConfig } from '@/lib/doctor-vapi';
 import { Button } from './ui/button';
 import AvailabilityChecker from './AvailabilityChecker';
+import  Image  from 'next/image';
 
 interface Doctor {
   id: string;
@@ -30,9 +31,9 @@ const doctors: Doctor[] = [
   { id: '4', name: 'Dr. James Wilson', expertise: 'Orthopedics' },
   { id: '5', name: 'Dr. Lisa Patel', expertise: 'Dermatology' },
   { id: '6', name: 'Dr. Robert Kim', expertise: 'Ophthalmology' },
-  { id: '7', name: 'Dr. Maria Garcia', expertise: 'Gynecology' },
-  { id: '8', name: 'Dr. David Thompson', expertise: 'Psychiatry' },
-  { id: '9', name: 'Dr. Anna Lee', expertise: 'Endocrinology' },
+  { id: '7', name: 'Dr. David Garcia', expertise: 'Gynecology' },
+  { id: '8', name: 'Dr. Maria Tim', expertise: 'Psychiatry' },
+  { id: '9', name: 'Dr. Ann Lee', expertise: 'Endocrinology' },
   { id: '10', name: 'Dr. John Smith', expertise: 'General Medicine' },
 ];
 
@@ -396,6 +397,13 @@ export default function DoctorList() {
         <div className="space-y-4">
           {doctors.map((doc) => (
             <div key={doc.id} className="bg-white rounded-xl shadow-md p-6 flex flex-col md:flex-row items-center justify-between gap-4">
+              <Image
+                src={`/images/doctor-${doc.id}.jpg`}
+                alt={doc.name}
+                width={80}
+                height={80}
+                className="rounded-full shadow-md"
+              />
               <div>
                 <div className="text-lg font-semibold text-gray-900">{doc.name}</div>
                 <div className="text-sm text-gray-500">{doc.expertise}</div>
