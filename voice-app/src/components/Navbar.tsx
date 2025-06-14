@@ -25,7 +25,7 @@ export default function Navbar() {
             {user ? (
               <div className="flex items-center gap-2">
                 <span className="text-sm text-gray-600 font-medium">
-                  Welcome, <span className="text-blue-400">{user.name}</span>
+                  Welcome to the Hospital's Portal, <span className="text-blue-400">{user.name}</span>
                 </span>
               </div>
             ) : (
