@@ -12,7 +12,7 @@ function initFirebaseAdmin() {
       console.log('🔧 Initializing new Firebase app...');
       
       if (!process.env.FIREBASE_PROJECT_ID || !process.env.FIREBASE_CLIENT_EMAIL || !process.env.FIREBASE_PRIVATE_KEY) {
-        console.error('❌ Missing Firebase Admin SDK credentials:', {
+        console.error('Missing Firebase Admin SDK credentials:', {
           hasProjectId: !!process.env.FIREBASE_PROJECT_ID,
           hasClientEmail: !!process.env.FIREBASE_CLIENT_EMAIL,
           hasPrivateKey: !!process.env.FIREBASE_PRIVATE_KEY
@@ -27,7 +27,7 @@ function initFirebaseAdmin() {
           privateKey: process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, "\n"),
         }),
       });
-      console.log('✅ Firebase app initialized successfully');
+      console.log('Firebase app initialized successfully');
     }
 
     return {
@@ -35,7 +35,7 @@ function initFirebaseAdmin() {
       db: getFirestore(),
     };
   } catch (error) {
-    console.error('❌ Failed to initialize Firebase Admin:', error);
+    console.error('Failed to initialize Firebase Admin:', error);
     if (error instanceof Error) {
       console.error('Error details:', error.message);
       console.error('Error stack:', error.stack);

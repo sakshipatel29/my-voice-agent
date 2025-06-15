@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(consultations);
   } catch (error) {
-    console.error('❌ Failed to fetch consultations:', error);
+    console.error('Failed to fetch consultations:', error);
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }

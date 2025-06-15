@@ -1,4 +1,3 @@
-// src/app/api/vapi-webhook/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { google } from 'googleapis';
 import { db } from '@/firebase/admin';

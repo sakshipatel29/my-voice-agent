@@ -31,24 +31,22 @@ export default function DoctorUpdate() {
       });
 
       vapiRef.current.on('error', (error: any) => {
-        console.error("❌ Error:", error);
+        console.error("Error:", error);
         setError(error.message);
       });
 
       vapiRef.current.on('message', (msg: any) => {
         if (msg.type === 'transcript' && msg.transcriptType === 'final') {
-          console.log('📝 Transcript:', msg.transcript);
           setMessages((prev) => [...prev, { role: msg.role, content: msg.transcript, timestamp: new Date().toISOString() }]);
         }
       });
 
       // Set up function call handler
       vapiRef.current.on('function-call', async (event: any) => {
-        console.log("📞 Function call received from assistant:", event.name, event.args);
 
         if (event.name === 'getTodaysConsultations') {
           try {
-            console.log("🔍 Fetching consultations for:", { 
+            console.log(" Fetching consultations for:", { 
               date: HARDCODED_DATE, 
               doctor: HARDCODED_DOCTOR_NAME 
             });
@@ -62,20 +60,20 @@ export default function DoctorUpdate() {
               }),
             });
             const data = await response.json();
-            console.log("📊 Consultations found:", data.consultations?.length || 0);
+            
             if (data.consultations?.length > 0) {
               console.log("📄 First consultation:", data.consultations[0]);
             }
             return data;
           } catch (error) {
-            console.error("❌ Failed to fetch consultations:", error);
+            console.error("Failed to fetch consultations:", error);
             return { error: 'Failed to fetch consultations' };
           }
         }
 
         if (event.name === 'getConsultationsByDate') {
           try {
-            console.log("🔍 Fetching consultations for:", { 
+            console.log(" Fetching consultations for:", { 
               date: HARDCODED_DATE, 
               doctor: HARDCODED_DOCTOR_NAME 
             });
@@ -89,13 +87,13 @@ export default function DoctorUpdate() {
               }),
             });
             const data = await response.json();
-            console.log("📊 Consultations found:", data.consultations?.length || 0);
+            console.log("Consultations found:", data.consultations?.length || 0);
             if (data.consultations?.length > 0) {
-              console.log("📄 First consultation:", data.consultations[0]);
+              console.log("First consultation:", data.consultations[0]);
             }
             return data;
           } catch (error) {
-            console.error("❌ Failed to fetch consultations:", error);
+            console.error("Failed to fetch consultations:", error);
             return { error: 'Failed to fetch consultations' };
           }
         }
@@ -107,10 +105,10 @@ export default function DoctorUpdate() {
             
             const response = await fetch(`/api/get-consultation/${consultationId}`);
             const data = await response.json();
-            console.log("📄 Consultation details:", data);
+            console.log("Consultation details:", data);
             return data;
           } catch (error) {
-            console.error("❌ Failed to fetch consultation details:", error);
+            console.error("Failed to fetch consultation details:", error);
             return { error: 'Failed to fetch consultation details' };
           }
         }
@@ -135,11 +133,6 @@ export default function DoctorUpdate() {
       return;
     }
 
-    console.log("👨‍⚕️ Using hardcoded values:", {
-      doctor: HARDCODED_DOCTOR_NAME,
-      date: HARDCODED_DATE
-    });
-
     const config = {
       ...doctorUpdateVapiConfig,
       name: `${HARDCODED_DOCTOR_NAME}'s Update Assistant`,
@@ -161,18 +154,18 @@ export default function DoctorUpdate() {
     try {
       vapiRef.current.start(config);
     } catch (err) {
-      console.error('❌ Failed to start call:', err);
+      console.error('Failed to start call:', err);
       setError('Failed to start the call.');
     }
   };
 
   const stopCall = () => {
     if (!vapiRef.current || !inCall) return;
-    console.log("🛑 Stopping call...");
+    
     try {
       vapiRef.current.stop();
     } catch (err) {
-      console.error('❌ Failed to stop call:', err);
+      console.error('Failed to stop call:', err);
     }
   };
 

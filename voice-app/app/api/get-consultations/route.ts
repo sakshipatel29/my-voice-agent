@@ -98,7 +98,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ consultations });
   } catch (error) {
-    console.error('❌ Error fetching consultations:', error);
+    console.error(' Error fetching consultations:', error);
     return NextResponse.json({ error: 'Failed to fetch consultations' }, { status: 500 });
   }
 } 
