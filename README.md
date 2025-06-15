@@ -2,7 +2,7 @@
 
 A powerful voice agent built with Vapi that enables natural voice interactions and intelligent task execution.
 
-![Sunrise Medical Hospital Portal](public/images/image.png)
+![Sunrise Medical Hospital Portal](/voice-app/public/images/image.png)
 *A glimpse of the user interface of the Sunrise Medical Hospital Portal.*
 
 ## 📖 About The Project
